@@ -8,7 +8,10 @@ export default defineConfig(({ mode }) => {
   const apiTarget = env.VITE_API_PROXY_TARGET || 'https://dev.api.woliba.io';
 
   return {
-    plugins: [react()],
+    plugins: [react({ jsxRuntime: 'automatic' })],
+    esbuild: {
+      jsxInject: "import React from 'react'",
+    },
     server: {
       proxy: {
         '/v1': {
@@ -17,6 +20,12 @@ export default defineConfig(({ mode }) => {
           secure: true,
         },
       },
+    },
+    test: {
+      environment: 'jsdom',
+      setupFiles: ['./src/test/setupTests.js'],
+      globals: true,
+      css: true,
     },
   };
 });

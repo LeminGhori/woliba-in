@@ -3,9 +3,9 @@ import registrationReducer from './registrationSlice';
 
 const STORAGE_KEY = 'woliba_registration_v1';
 
-function safeParse(json: string) {
+function safeParse(json) {
   try {
-    return JSON.parse(json) as unknown;
+    return JSON.parse(json);
   } catch {
     return null;
   }
@@ -18,15 +18,14 @@ function getPreloadedRegistrationState() {
   const parsed = safeParse(raw);
   if (!parsed || typeof parsed !== 'object') return undefined;
 
-  // Minimal sanity checks: keep only the keys we expect.
   return {
-    ...(parsed as any),
+    ...parsed,
     loading: false,
     error: null,
   };
 }
 
-function persistRegistrationState(state: unknown) {
+function persistRegistrationState(state) {
   if (typeof window === 'undefined') return;
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -51,9 +50,6 @@ store.subscribe(() => {
   const state = store.getState();
   persistRegistrationState(state.registration);
 });
-
-export type RootState = ReturnType<typeof store.getState>;
-export type AppDispatch = typeof store.dispatch;
 
 export default store;
 

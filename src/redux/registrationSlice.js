@@ -1,38 +1,6 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
-type Company = Record<string, any> | null;
-
-type UserDetails = {
-  email: string;
-  fname: string;
-  lname: string;
-};
-
-type Profile = {
-  password: string;
-  confirmPassword: string;
-  birthday: string;
-  phone: string;
-  workAnniversary: string;
-  acceptedTerms: boolean;
-};
-
-export type RegistrationState = {
-  company: Company;
-  userDetails: UserDetails;
-  otpToken: string;
-  emailVerified: boolean;
-  otpVerified: boolean;
-  profile: Profile;
-  selectedInterests: number[];
-  selectedPillars: number[];
-  registeredUser: any;
-  authToken: string | null;
-  loading: boolean;
-  error: string | null;
-};
-
-const initialState: RegistrationState = {
+const initialState = {
   company: null,
   userDetails: {
     email: '',
@@ -62,46 +30,46 @@ const registrationSlice = createSlice({
   name: 'registration',
   initialState,
   reducers: {
-    setCompany(state, action: PayloadAction<any>) {
+    setCompany(state, action) {
       state.company = action.payload;
       state.error = null;
     },
-    setUserDetails(state, action: PayloadAction<Partial<UserDetails>>) {
+    setUserDetails(state, action) {
       state.userDetails = { ...state.userDetails, ...action.payload };
       state.error = null;
     },
-    setOtpToken(state, action: PayloadAction<string>) {
+    setOtpToken(state, action) {
       state.otpToken = action.payload;
       state.error = null;
     },
-    setEmailVerified(state, action: PayloadAction<boolean>) {
+    setEmailVerified(state, action) {
       state.emailVerified = action.payload;
       state.error = null;
     },
-    setOtpVerified(state, action: PayloadAction<boolean>) {
+    setOtpVerified(state, action) {
       state.otpVerified = action.payload;
       state.error = null;
     },
-    setProfile(state, action: PayloadAction<Partial<Profile>>) {
+    setProfile(state, action) {
       state.profile = { ...state.profile, ...action.payload };
       state.error = null;
     },
-    setSelectedInterests(state, action: PayloadAction<number[]>) {
+    setSelectedInterests(state, action) {
       state.selectedInterests = action.payload;
       state.error = null;
     },
-    toggleInterest(state, action: PayloadAction<number>) {
+    toggleInterest(state, action) {
       const id = action.payload;
       const exists = state.selectedInterests.includes(id);
       state.selectedInterests = exists
         ? state.selectedInterests.filter((item) => item !== id)
         : [...state.selectedInterests, id];
     },
-    setSelectedPillars(state, action: PayloadAction<number[]>) {
+    setSelectedPillars(state, action) {
       state.selectedPillars = action.payload;
       state.error = null;
     },
-    togglePillar(state, action: PayloadAction<number>) {
+    togglePillar(state, action) {
       const id = action.payload;
       const index = state.selectedPillars.indexOf(id);
       if (index >= 0) {
@@ -110,15 +78,15 @@ const registrationSlice = createSlice({
         state.selectedPillars = [...state.selectedPillars, id];
       }
     },
-    setRegisteredUser(state, action: PayloadAction<{ user: any; token: string | null }>) {
+    setRegisteredUser(state, action) {
       state.registeredUser = action.payload.user;
       state.authToken = action.payload.token;
       state.error = null;
     },
-    setLoading(state, action: PayloadAction<boolean>) {
+    setLoading(state, action) {
       state.loading = action.payload;
     },
-    setError(state, action: PayloadAction<string>) {
+    setError(state, action) {
       state.error = action.payload;
       state.loading = false;
     },

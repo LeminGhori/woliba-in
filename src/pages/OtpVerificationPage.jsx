@@ -1,4 +1,3 @@
-import type { FormEvent } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { verifyOtp, resendOtp } from '../api/registrationApi';
@@ -17,19 +16,17 @@ import {
 import { validateOtp } from '../utils/validations';
 import { OTP_RESEND_SECONDS, ROUTES } from '../utils/constants';
 
-type LocationState = {
-  autoResendOtp?: boolean;
-};
-
 export default function OtpVerificationPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { userDetails, otpToken, loading, error } = useAppSelector((state) => state.registration);
+  const { userDetails, otpToken, loading, error } = useAppSelector(
+    (state) => state.registration
+  );
 
   const [otp, setOtp] = useState('');
   const [fieldError, setFieldError] = useState('');
-  const [secondsLeft, setSecondsLeft] = useState<number>(OTP_RESEND_SECONDS);
+  const [secondsLeft, setSecondsLeft] = useState(OTP_RESEND_SECONDS);
   const [resendSuccess, setResendSuccess] = useState(false);
   const autoResendStarted = useRef(false);
 
@@ -41,7 +38,7 @@ export default function OtpVerificationPage() {
     return () => clearInterval(timer);
   }, [secondsLeft]);
 
-  const formatTime = (seconds: number) => {
+  const formatTime = (seconds) => {
     const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
     const secs = String(seconds % 60).padStart(2, '0');
     return `${mins} : ${secs}`;
@@ -64,14 +61,14 @@ export default function OtpVerificationPage() {
       setResendSuccess(false);
       dispatch(setLoading(true));
       try {
-        const response: any = await resendOtp(userDetails.email);
+        const response = await resendOtp(userDetails.email);
         const token = response?.data?.token;
         if (token) dispatch(setOtpToken(token));
         setSecondsLeft(OTP_RESEND_SECONDS);
         setOtp('');
         setResendSuccess(true);
       } catch (err) {
-        dispatch(setError((err as Error).message));
+        dispatch(setError(err?.message || 'Something went wrong. Please try again.'));
       } finally {
         dispatch(setLoading(false));
       }
@@ -84,7 +81,7 @@ export default function OtpVerificationPage() {
   };
 
   useEffect(() => {
-    const state = (location.state as LocationState | null) || null;
+    const state = location.state || null;
     if (!state?.autoResendOtp || autoResendStarted.current) return;
     if (!userDetails.email) return;
 
@@ -93,7 +90,7 @@ export default function OtpVerificationPage() {
     void sendOtpResend(true);
   }, [location.state, userDetails.email, dispatch, sendOtpResend]);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     dispatch(clearError());
     const otpError = validateOtp(otp);
@@ -110,7 +107,7 @@ export default function OtpVerificationPage() {
       navigate(ROUTES.PROFILE);
     } catch (err) {
       setFieldError('Incorrect OTP');
-      dispatch(setError((err as Error).message));
+      dispatch(setError(err?.message || 'Something went wrong. Please try again.'));
     } finally {
       dispatch(setLoading(false));
     }
@@ -130,14 +127,14 @@ export default function OtpVerificationPage() {
           A new OTP has been sent to your email.
         </p>
       )}
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} aria-label="OTP verification form">
         <OtpInput value={otp} onChange={setOtp} disabled={loading} />
         {displayError && (
           <p className="form-error form-error--center" role="alert">
             {fieldError === 'Incorrect OTP' ? 'Incorrect OTP' : displayError}
           </p>
         )}
-        <div className="resend-text">
+        <div className="resend-text" role="status" aria-live="polite">
           {secondsLeft > 0 ? (
             <span>Resend OTP in {formatTime(secondsLeft)}</span>
           ) : (

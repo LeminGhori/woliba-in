@@ -1,8 +1,4 @@
-type ErrorAlertProps = {
-  message?: string | null;
-};
-
-export default function ErrorAlert({ message }: ErrorAlertProps) {
+export default function ErrorAlert({ message }) {
   if (!message) return null;
   return (
     <div className="alert alert--error" role="alert">

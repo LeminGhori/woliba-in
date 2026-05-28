@@ -1,14 +1,7 @@
-import type { ClipboardEvent, KeyboardEvent } from 'react';
 import { useEffect, useRef } from 'react';
 
-type OtpInputProps = {
-  value: string;
-  onChange: (next: string) => void;
-  disabled?: boolean;
-};
-
-export default function OtpInput({ value, onChange, disabled = false }: OtpInputProps) {
-  const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
+export default function OtpInput({ value, onChange, disabled = false }) {
+  const inputsRef = useRef([]);
 
   useEffect(() => {
     inputsRef.current[0]?.focus();
@@ -16,11 +9,11 @@ export default function OtpInput({ value, onChange, disabled = false }: OtpInput
 
   const digits = value.padEnd(6, ' ').split('').slice(0, 6);
 
-  const updateValue = (nextDigits: string[]) => {
+  const updateValue = (nextDigits) => {
     onChange(nextDigits.join('').replace(/\s/g, '').slice(0, 6));
   };
 
-  const handleChange = (index: number, inputValue: string) => {
+  const handleChange = (index, inputValue) => {
     const digit = inputValue.replace(/\D/g, '').slice(-1);
     const next = [...digits.map((d) => (d === ' ' ? '' : d))];
     next[index] = digit;
@@ -30,7 +23,7 @@ export default function OtpInput({ value, onChange, disabled = false }: OtpInput
     }
   };
 
-  const handleKeyDown = (index: number, event: KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (index, event) => {
     if (event.key === 'Backspace') {
       const current = digits[index] === ' ' ? '' : digits[index];
       if (!current && index > 0) {
@@ -43,7 +36,7 @@ export default function OtpInput({ value, onChange, disabled = false }: OtpInput
     }
   };
 
-  const handlePaste = (event: ClipboardEvent<HTMLDivElement>) => {
+  const handlePaste = (event) => {
     event.preventDefault();
     const pasted = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
     if (!pasted) return;
@@ -56,7 +49,7 @@ export default function OtpInput({ value, onChange, disabled = false }: OtpInput
     <div className="otp-wrapper" onPaste={handlePaste}>
       {digits.map((digit, index) => (
         <input
-          key={index}
+          key={`otp-${index}`}
           ref={(el) => {
             inputsRef.current[index] = el;
           }}

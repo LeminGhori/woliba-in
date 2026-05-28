@@ -1,16 +1,7 @@
-import type { ReactNode } from 'react';
 import backgroundImage from '../assets/Background.png';
 import logoImage from '../assets/woliba Logo.png';
 import LanguageSelector from './LanguageSelector';
 import SiteFooter from './SiteFooter';
-
-type LayoutProps = {
-  children: ReactNode;
-  wide?: boolean;
-  welcome?: boolean;
-  showLogo?: boolean;
-  pageTitle?: string;
-};
 
 export default function Layout({
   children,
@@ -18,7 +9,7 @@ export default function Layout({
   welcome = false,
   showLogo = true,
   pageTitle,
-}: LayoutProps) {
+}) {
   return (
     <div
       className="page-shell"

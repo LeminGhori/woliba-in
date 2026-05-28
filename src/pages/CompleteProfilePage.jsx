@@ -1,4 +1,3 @@
-import type { ChangeEvent, FormEvent } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
@@ -14,35 +13,21 @@ import {
 } from '../utils/validations';
 import { ROUTES } from '../utils/constants';
 
-type ProfileFields = {
-  password: string;
-  confirmPassword: string;
-  birthday: string;
-  phone: string;
-  acceptedTerms: boolean;
-};
-
-type Touched = Partial<Record<'password' | 'confirmPassword' | 'birthday' | 'phone' | 'terms', boolean>>;
-
 export default function CompleteProfilePage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { profile } = useAppSelector((state) => state.registration);
 
-  const [password, setPassword] = useState<string>(profile.password || '');
-  const [confirmPassword, setConfirmPassword] = useState<string>(
-    profile.confirmPassword || ''
-  );
-  const [birthday, setBirthday] = useState<string>(profile.birthday || '');
-  const [phone, setPhone] = useState<string>(profile.phone || '');
-  const [acceptedTerms, setAcceptedTerms] = useState<boolean>(
-    profile.acceptedTerms || false
-  );
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [touched, setTouched] = useState<Touched>({});
+  const [password, setPassword] = useState(profile.password || '');
+  const [confirmPassword, setConfirmPassword] = useState(profile.confirmPassword || '');
+  const [birthday, setBirthday] = useState(profile.birthday || '');
+  const [phone, setPhone] = useState(profile.phone || '');
+  const [acceptedTerms, setAcceptedTerms] = useState(profile.acceptedTerms || false);
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [touched, setTouched] = useState({});
   const [showDatePicker, setShowDatePicker] = useState(false);
 
-  const fields: ProfileFields = useMemo(
+  const fields = useMemo(
     () => ({
       password,
       confirmPassword,
@@ -54,24 +39,21 @@ export default function CompleteProfilePage() {
   );
 
   const runValidation = useCallback(
-    (nextTouched: Touched = touched, values: ProfileFields = fields) => {
-      const errors = getProfileFieldErrors(values, nextTouched as any) as Record<
-        string,
-        string
-      >;
+    (nextTouched = touched, values = fields) => {
+      const errors = getProfileFieldErrors(values, nextTouched);
       setFieldErrors(errors);
       return errors;
     },
     [touched, fields]
   );
 
-  const markTouched = (key: keyof Touched) => {
+  const markTouched = (key) => {
     const nextTouched = { ...touched, [key]: true };
     setTouched(nextTouched);
     runValidation(nextTouched);
   };
 
-  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handlePasswordChange = (e) => {
     const value = e.target.value;
     setPassword(value);
     setFieldErrors((prev) => {
@@ -79,36 +61,32 @@ export default function CompleteProfilePage() {
       next.password = value ? validatePassword(value) : '';
       if (confirmPassword) {
         next.confirmPassword =
-          value !== confirmPassword
-            ? 'Passwords do not match. Please re-enter.'
-            : '';
+          value !== confirmPassword ? 'Passwords do not match. Please re-enter.' : '';
       }
       return next;
     });
   };
 
-  const handleConfirmPasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleConfirmPasswordChange = (e) => {
     const value = e.target.value;
     setConfirmPassword(value);
     setFieldErrors((prev) => ({
       ...prev,
       confirmPassword:
-        value && password !== value
-          ? 'Passwords do not match. Please re-enter.'
-          : '',
+        value && password !== value ? 'Passwords do not match. Please re-enter.' : '',
     }));
   };
 
-  const handleBirthdaySelect = (value: string) => {
+  const handleBirthdaySelect = (value) => {
     setBirthday(value);
-    const nextTouched: Touched = { ...touched, birthday: true };
+    const nextTouched = { ...touched, birthday: true };
     setTouched(nextTouched);
     runValidation(nextTouched, { ...fields, birthday: value });
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    const allTouched: Touched = {
+    const allTouched = {
       password: true,
       confirmPassword: true,
       birthday: true,
@@ -116,10 +94,7 @@ export default function CompleteProfilePage() {
       terms: true,
     };
     setTouched(allTouched);
-    const errors = getProfileFieldErrors(fields, allTouched as any) as Record<
-      string,
-      string
-    >;
+    const errors = getProfileFieldErrors(fields, allTouched);
     setFieldErrors(errors);
     if (Object.keys(errors).length) return;
 
@@ -139,7 +114,7 @@ export default function CompleteProfilePage() {
 
   return (
     <Layout pageTitle="Login Credentials">
-      <form onSubmit={handleSubmit} noValidate>
+      <form onSubmit={handleSubmit} noValidate aria-label="Complete profile form">
         <Input
           id="password"
           label="Password"
@@ -149,6 +124,7 @@ export default function CompleteProfilePage() {
           onChange={handlePasswordChange}
           onBlur={() => markTouched('password')}
           error={fieldErrors.password}
+          autoComplete="new-password"
         />
         <Input
           id="confirmPassword"
@@ -159,6 +135,7 @@ export default function CompleteProfilePage() {
           onChange={handleConfirmPasswordChange}
           onBlur={() => markTouched('confirmPassword')}
           error={fieldErrors.confirmPassword}
+          autoComplete="new-password"
         />
         <div className="form-group">
           <label className="form-label" htmlFor="birthday">
@@ -174,9 +151,11 @@ export default function CompleteProfilePage() {
             value={birthday}
             onClick={() => setShowDatePicker(true)}
             onBlur={() => markTouched('birthday')}
+            aria-invalid={Boolean(fieldErrors.birthday)}
+            aria-describedby={fieldErrors.birthday ? 'birthday-error' : undefined}
           />
           {fieldErrors.birthday && (
-            <p className="form-error" role="alert">
+            <p className="form-error" id="birthday-error" role="alert">
               {fieldErrors.birthday}
             </p>
           )}
@@ -186,7 +165,7 @@ export default function CompleteProfilePage() {
           label="Contact number"
           placeholder="Enter contact number"
           value={phone}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+          onChange={(e) => {
             setPhone(e.target.value);
             if (touched.phone) {
               runValidation(touched, { ...fields, phone: e.target.value });
@@ -194,12 +173,13 @@ export default function CompleteProfilePage() {
           }}
           onBlur={() => markTouched('phone')}
           error={fieldErrors.phone}
+          autoComplete="tel"
         />
         <label className="form-checkbox">
           <input
             type="checkbox"
             checked={acceptedTerms}
-            onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            onChange={(e) => {
               setAcceptedTerms(e.target.checked);
               if (touched.terms) {
                 runValidation(

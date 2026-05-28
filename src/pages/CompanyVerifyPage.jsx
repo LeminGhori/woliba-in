@@ -1,4 +1,3 @@
-import type { ChangeEvent, FormEvent } from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { verifyCompany } from '../api/registrationApi';
@@ -7,16 +6,9 @@ import Input from '../components/Input';
 import Button from '../components/Button';
 import ErrorAlert from '../components/ErrorAlert';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import {
-  setCompany,
-  setLoading,
-  setError,
-  clearError,
-} from '../redux/registrationSlice';
+import { setCompany, setLoading, setError, clearError } from '../redux/registrationSlice';
 import { validateCompanyPassword } from '../utils/validations';
 import { ROUTES } from '../utils/constants';
-
-type FieldErrors = Partial<Record<'companyName' | 'password', string>>;
 
 export default function CompanyVerifyPage() {
   const dispatch = useAppDispatch();
@@ -25,9 +17,9 @@ export default function CompanyVerifyPage() {
 
   const [companyName, setCompanyName] = useState('');
   const [password, setPassword] = useState('');
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [fieldErrors, setFieldErrors] = useState({});
 
-  const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handlePasswordChange = (e) => {
     const value = e.target.value;
     setPassword(value);
     if (value) {
@@ -40,11 +32,11 @@ export default function CompanyVerifyPage() {
     }
   };
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     dispatch(clearError());
 
-    const errors: FieldErrors = {};
+    const errors = {};
     if (!companyName.trim()) errors.companyName = 'Company name is required.';
     const passwordError = validateCompanyPassword(password);
     if (passwordError) errors.password = passwordError;
@@ -58,17 +50,15 @@ export default function CompanyVerifyPage() {
     dispatch(setLoading(true));
 
     try {
-      const response: any = await verifyCompany(companyName.trim(), password);
+      const response = await verifyCompany(companyName.trim(), password);
       const company = response?.data?.[0];
       if (!company) {
-        throw new Error(
-          'Company verification failed. Please check your credentials.'
-        );
+        throw new Error('Company verification failed. Please check your credentials.');
       }
       dispatch(setCompany(company));
       navigate(ROUTES.USER_DETAILS);
     } catch (err) {
-      dispatch(setError((err as Error).message));
+      dispatch(setError(err?.message || 'Something went wrong. Please try again.'));
     } finally {
       dispatch(setLoading(false));
     }
@@ -77,7 +67,7 @@ export default function CompanyVerifyPage() {
   return (
     <Layout pageTitle="Registration">
       <ErrorAlert message={error} />
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} aria-label="Company verification form">
         <Input
           id="companyName"
           label="Company Name"
@@ -85,6 +75,7 @@ export default function CompanyVerifyPage() {
           value={companyName}
           onChange={(e) => setCompanyName(e.target.value)}
           error={fieldErrors.companyName}
+          autoComplete="organization"
         />
         <Input
           id="password"
@@ -102,6 +93,7 @@ export default function CompanyVerifyPage() {
             }
           }}
           error={fieldErrors.password}
+          autoComplete="current-password"
         />
         <Button type="submit" loading={loading} className="btn--block">
           Next

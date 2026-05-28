@@ -6,12 +6,7 @@ import ErrorAlert from '../components/ErrorAlert';
 import Button from '../components/Button';
 import loaderVideo from '../assets/Loader scrren GIF.mp4';
 import { useAppDispatch, useAppSelector } from '../redux/hooks';
-import {
-  setRegisteredUser,
-  setLoading,
-  setError,
-  clearError,
-} from '../redux/registrationSlice';
+import { setRegisteredUser, setLoading, setError, clearError } from '../redux/registrationSlice';
 import {
   buildUserRegistrationPayload,
   isEmailAlreadyRegisteredError,
@@ -52,8 +47,8 @@ export default function RegistrationProcessingPage() {
       dispatch(clearError());
       dispatch(setLoading(true));
       try {
-        const payload: any = buildUserRegistrationPayload(state);
-        const response: any = await completeRegistration(payload);
+        const payload = buildUserRegistrationPayload(state);
+        const response = await completeRegistration(payload);
         const fallbackUser = {
           fname: state.userDetails.fname,
           lname: state.userDetails.lname,
@@ -65,7 +60,7 @@ export default function RegistrationProcessingPage() {
         dispatch(setRegisteredUser({ user, token }));
         navigate(ROUTES.WELCOME);
       } catch (err) {
-        dispatch(setError((err as Error).message));
+        dispatch(setError(err?.message || 'Something went wrong. Please try again.'));
       } finally {
         dispatch(setLoading(false));
       }
@@ -78,7 +73,7 @@ export default function RegistrationProcessingPage() {
 
   return (
     <Layout showLogo={false}>
-      <div className="processing-screen">
+      <div className="processing-screen" aria-busy={loading}>
         <video
           src={loaderVideo}
           autoPlay
@@ -89,7 +84,7 @@ export default function RegistrationProcessingPage() {
         />
         <h2>Getting your wellness journey ready...</h2>
         {loading && (
-          <p className="card__subtitle">
+          <p className="card__subtitle" role="status" aria-live="polite">
             Please wait while we complete your registration.
           </p>
         )}

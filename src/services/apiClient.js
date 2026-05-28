@@ -1,11 +1,33 @@
 import axios from 'axios';
 import { API_BASE_URL } from '../utils/constants';
 
-function extractApiErrorMessage(payload: unknown): string | null {
+function extractApiErrorMessage(payload) {
   if (!payload) return null;
   if (typeof payload === 'string') return payload;
-  const p = payload as any;
+  const p = payload;
   return p?.data?.message || p?.error || p?.message || null;
+}
+
+function normalizeAxiosError(error) {
+  const payload = error?.response?.data;
+
+  if (typeof payload === 'string' && payload.includes('<Error>')) {
+    return new Error(
+      'API host misconfigured. Use https://dev.api.woliba.io/v1 (not dev.woliba.io).'
+    );
+  }
+
+  const message =
+    extractApiErrorMessage(payload) ||
+    extractApiErrorMessage(error?.response) ||
+    error?.message ||
+    'Something went wrong. Please try again.';
+
+  const err = new Error(message);
+  err.status = error?.response?.status;
+  err.code = error?.code;
+  err.data = payload;
+  return err;
 }
 
 const apiClient = axios.create({
@@ -18,7 +40,7 @@ const apiClient = axios.create({
 
 apiClient.interceptors.response.use(
   (response) => {
-    const body = response.data as any;
+    const body = response.data;
     const failed =
       body?.status === 'failed' || body?.status === false || body?.status === 'error';
 
@@ -31,22 +53,7 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
-    const payload = error.response?.data as unknown;
-
-    if (typeof payload === 'string' && payload.includes('<Error>')) {
-      return Promise.reject(
-        new Error(
-          'API host misconfigured. Use https://dev.api.woliba.io/v1 (not dev.woliba.io).'
-        )
-      );
-    }
-
-    const message =
-      extractApiErrorMessage(payload) ||
-      (error as Error).message ||
-      'Something went wrong. Please try again.';
-
-    return Promise.reject(new Error(message));
+    return Promise.reject(normalizeAxiosError(error));
   }
 );
 

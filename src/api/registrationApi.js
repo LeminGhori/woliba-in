@@ -1,7 +1,7 @@
 import apiClient from '../services/apiClient';
 import { API_ORIGIN } from '../utils/constants';
 
-export async function verifyCompany(companyName: string, password: string) {
+export async function verifyCompany(companyName, password) {
   const { data } = await apiClient.post('/verify-by-company-name-and-password', {
     company_name: companyName.trim(),
     password,
@@ -9,12 +9,12 @@ export async function verifyCompany(companyName: string, password: string) {
   return data;
 }
 
-export async function saveUserDetails(payload: unknown) {
+export async function saveUserDetails(payload) {
   const { data } = await apiClient.post('/save-user-details-and-send-otp', payload);
   return data;
 }
 
-export async function verifyOtp(otp: string, token: string) {
+export async function verifyOtp(otp, token) {
   const { data } = await apiClient.post('/verify-otp-for-user-registration', {
     otp,
     token,
@@ -22,7 +22,7 @@ export async function verifyOtp(otp: string, token: string) {
   return data;
 }
 
-export async function resendOtp(email: string) {
+export async function resendOtp(email) {
   const { data } = await apiClient.post('/send-otp-for-user-registration', {
     email,
   });
@@ -44,7 +44,7 @@ export async function fetchWellbeingPillars(languageId = 1) {
   return data;
 }
 
-export async function completeRegistration(payload: unknown) {
+export async function completeRegistration(payload) {
   const { data } = await apiClient.post('/user-registration', payload);
   return data;
 }

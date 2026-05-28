@@ -1,19 +1,6 @@
-import type { ReactNode } from 'react';
 import { Navigate } from 'react-router-dom';
 import { ROUTES } from '../utils/constants';
 import { useAppSelector } from '../redux/hooks';
-
-type ProtectedRouteProps = {
-  children: ReactNode;
-  requireCompany?: boolean;
-  requireUserDetails?: boolean;
-  requireOtp?: boolean;
-  requireEmailVerified?: boolean;
-  requireOtpVerified?: boolean;
-  requireProfile?: boolean;
-  requireInterests?: boolean;
-  requirePillars?: boolean;
-};
 
 export default function ProtectedRoute({
   children,
@@ -25,13 +12,13 @@ export default function ProtectedRoute({
   requireProfile,
   requireInterests,
   requirePillars,
-}: ProtectedRouteProps) {
+}) {
   const state = useAppSelector((s) => s.registration);
 
   if (requireCompany && !state.company) {
     return <Navigate to={ROUTES.COMPANY_VERIFY} replace />;
   }
-  if (requireUserDetails && !state.userDetails.email) {
+  if (requireUserDetails && !state.userDetails?.email) {
     return <Navigate to={ROUTES.USER_DETAILS} replace />;
   }
   if (requireOtp && !state.otpToken) {
@@ -43,13 +30,13 @@ export default function ProtectedRoute({
   if (requireOtpVerified && !state.otpVerified) {
     return <Navigate to={ROUTES.OTP} replace />;
   }
-  if (requireProfile && !state.profile.password) {
+  if (requireProfile && !state.profile?.password) {
     return <Navigate to={ROUTES.PROFILE} replace />;
   }
-  if (requireInterests && state.selectedInterests.length === 0) {
+  if (requireInterests && (state.selectedInterests || []).length === 0) {
     return <Navigate to={ROUTES.INTERESTS} replace />;
   }
-  if (requirePillars && state.selectedPillars.length !== 3) {
+  if (requirePillars && (state.selectedPillars || []).length !== 3) {
     return <Navigate to={ROUTES.PILLARS} replace />;
   }
 

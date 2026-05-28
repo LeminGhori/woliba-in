@@ -1,13 +1,3 @@
-import type { InputHTMLAttributes } from 'react';
-
-type InputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'id'> & {
-  label?: string;
-  id: string;
-  error?: string;
-  className?: string;
-  inputClassName?: string;
-};
-
 export default function Input({
   label,
   id,
@@ -15,7 +5,7 @@ export default function Input({
   className = '',
   inputClassName = '',
   ...props
-}: InputProps) {
+}) {
   return (
     <div className="form-group">
       {label && (

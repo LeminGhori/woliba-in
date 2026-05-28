@@ -1,10 +1,10 @@
 import { birthdayToApiFormat } from './validations';
 
 /** Flatten nested interest arrays returned by viewWellnessInterest */
-export function normalizeInterests(data: unknown) {
+export function normalizeInterests(data) {
   if (!Array.isArray(data)) return [];
   if (data.length > 0 && Array.isArray(data[0])) {
-    return (data as unknown[][]).flat();
+    return data.flat();
   }
   return data;
 }
@@ -13,7 +13,7 @@ export function normalizeInterests(data: unknown) {
  * POST /user-registration body per API doc (section 7).
  * `email` is required by the API even though the doc sample omits it (-106 without it).
  */
-export function buildUserRegistrationPayload(registrationState: any) {
+export function buildUserRegistrationPayload(registrationState) {
   const { userDetails, profile, otpToken, selectedInterests, selectedPillars } =
     registrationState;
 
@@ -50,21 +50,21 @@ export function buildUserRegistrationPayload(registrationState: any) {
   };
 }
 
-export function isEmailAlreadyRegisteredError(message: unknown) {
+export function isEmailAlreadyRegisteredError(message) {
   return (
     typeof message === 'string' &&
     message.toLowerCase().includes('already registered')
   );
 }
 
-export function isSessionExpiredError(message: unknown) {
+export function isSessionExpiredError(message) {
   return (
     typeof message === 'string' && message.toLowerCase().includes('session expired')
   );
 }
 
 /** Normalize user-registration success payload (API shape varies on dev). */
-export function parseRegistrationUser(apiResponse: any, fallback: any) {
+export function parseRegistrationUser(apiResponse, fallback) {
   const data = apiResponse?.data || {};
   const apiUser = data?.user || apiResponse?.user || null;
 
@@ -100,7 +100,7 @@ export function parseRegistrationUser(apiResponse: any, fallback: any) {
   return fallback;
 }
 
-export function parseRegistrationAuthToken(apiResponse: any) {
+export function parseRegistrationAuthToken(apiResponse) {
   return apiResponse?.data?.token || apiResponse?.token || null;
 }
 

@@ -15,11 +15,11 @@ const MONTHS = [
   'December',
 ];
 
-function pad(n: number) {
+function pad(n) {
   return String(n).padStart(2, '0');
 }
 
-function parseValue(value?: string) {
+function parseValue(value) {
   const match = value?.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
   if (!match) return null;
   return {
@@ -29,20 +29,8 @@ function parseValue(value?: string) {
   };
 }
 
-type DatePickerProps = {
-  value: string;
-  onChange: (next: string) => void;
-  onClose: () => void;
-};
-
-type SelectedDate = {
-  month: number;
-  day: number;
-  year: number;
-};
-
-export default function DatePicker({ value, onChange, onClose }: DatePickerProps) {
-  const initial: SelectedDate =
+export default function DatePicker({ value, onChange, onClose }) {
+  const initial =
     parseValue(value) || {
       month: new Date().getMonth(),
       day: new Date().getDate(),
@@ -51,13 +39,13 @@ export default function DatePicker({ value, onChange, onClose }: DatePickerProps
 
   const [viewMonth, setViewMonth] = useState(initial.month);
   const [viewYear, setViewYear] = useState(initial.year);
-  const [selected, setSelected] = useState<SelectedDate>(initial);
+  const [selected, setSelected] = useState(initial);
 
   const days = useMemo(() => {
     const first = new Date(viewYear, viewMonth, 1);
     const startPad = first.getDay();
     const total = new Date(viewYear, viewMonth + 1, 0).getDate();
-    const cells: Array<number | null> = [];
+    const cells = [];
     for (let i = 0; i < startPad; i += 1) cells.push(null);
     for (let d = 1; d <= total; d += 1) cells.push(d);
     return cells;

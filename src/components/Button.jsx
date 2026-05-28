@@ -1,11 +1,3 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
-
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  children: ReactNode;
-  loading?: boolean;
-  variant?: 'primary' | 'outline';
-};
-
 export default function Button({
   children,
   loading = false,
@@ -14,7 +6,7 @@ export default function Button({
   type = 'button',
   disabled,
   ...props
-}: ButtonProps) {
+}) {
   return (
     <button
       type={type}

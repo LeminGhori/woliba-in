@@ -1,4 +1,3 @@
-import type { ChangeEvent, FormEvent } from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { saveUserDetails } from '../api/registrationApi';
@@ -18,29 +17,26 @@ import {
 import { validateEmail, validateName } from '../utils/validations';
 import { ROUTES } from '../utils/constants';
 
-type UserDetailsErrors = Partial<Record<'email' | 'fname' | 'lname', string>>;
-type Touched = Partial<Record<'email' | 'fname' | 'lname', boolean>>;
-
 export default function UserDetailsPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { company, userDetails, loading, error } = useAppSelector((state) => state.registration);
+  const { company, userDetails, loading, error } = useAppSelector(
+    (state) => state.registration
+  );
 
-  const [email, setEmail] = useState<string>(userDetails.email || '');
-  const [fname, setFname] = useState<string>(userDetails.fname || '');
-  const [lname, setLname] = useState<string>(userDetails.lname || '');
-  const [fieldErrors, setFieldErrors] = useState<UserDetailsErrors>({});
-  const [touched, setTouched] = useState<Touched>({});
+  const [email, setEmail] = useState(userDetails.email || '');
+  const [fname, setFname] = useState(userDetails.fname || '');
+  const [lname, setLname] = useState(userDetails.lname || '');
+  const [fieldErrors, setFieldErrors] = useState({});
+  const [touched, setTouched] = useState({});
 
-  const validateForm = (): UserDetailsErrors => {
-    const errors: UserDetailsErrors = {
+  const validateForm = () => {
+    const errors = {
       email: validateEmail(email),
       fname: validateName(fname, 'First name'),
       lname: validateName(lname, 'Last name'),
     };
-    return Object.fromEntries(
-      Object.entries(errors).filter(([, v]) => v)
-    ) as UserDetailsErrors;
+    return Object.fromEntries(Object.entries(errors).filter(([, v]) => v));
   };
 
   const isFormComplete =
@@ -60,7 +56,7 @@ export default function UserDetailsPage() {
     dispatch(setLoading(true));
 
     try {
-      const response: any = await saveUserDetails({
+      const response = await saveUserDetails({
         company_id: company.id,
         mail: email.trim(),
         fname: fname.trim(),
@@ -83,7 +79,7 @@ export default function UserDetailsPage() {
       dispatch(setEmailVerified(true));
       navigate(ROUTES.OTP);
     } catch (err) {
-      dispatch(setError((err as Error).message));
+      dispatch(setError(err?.message || 'Something went wrong. Please try again.'));
     } finally {
       dispatch(setLoading(false));
     }
@@ -93,7 +89,8 @@ export default function UserDetailsPage() {
     <Layout pageTitle="Registration">
       <ErrorAlert message={error} />
       <form
-        onSubmit={(e: FormEvent<HTMLFormElement>) => {
+        aria-label="User details form"
+        onSubmit={(e) => {
           e.preventDefault();
           if (isFormComplete) void handleVerifyEmail();
         }}
@@ -104,7 +101,7 @@ export default function UserDetailsPage() {
           type="email"
           placeholder="Enter email id"
           value={email}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+          onChange={(e) => {
             setEmail(e.target.value);
             if (touched.email) {
               setFieldErrors((prev) => ({
@@ -113,7 +110,7 @@ export default function UserDetailsPage() {
               }));
             }
           }}
-          onBlur={(e: ChangeEvent<HTMLInputElement>) => {
+          onBlur={(e) => {
             setTouched((t) => ({ ...t, email: true }));
             setFieldErrors((prev) => ({
               ...prev,
@@ -121,13 +118,14 @@ export default function UserDetailsPage() {
             }));
           }}
           error={fieldErrors.email}
+          autoComplete="email"
         />
         <Input
           id="fname"
           label="First name"
           placeholder="Enter First name"
           value={fname}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+          onChange={(e) => {
             setFname(e.target.value);
             if (touched.fname) {
               setFieldErrors((prev) => ({
@@ -136,7 +134,7 @@ export default function UserDetailsPage() {
               }));
             }
           }}
-          onBlur={(e: ChangeEvent<HTMLInputElement>) => {
+          onBlur={(e) => {
             setTouched((t) => ({ ...t, fname: true }));
             setFieldErrors((prev) => ({
               ...prev,
@@ -144,13 +142,14 @@ export default function UserDetailsPage() {
             }));
           }}
           error={fieldErrors.fname}
+          autoComplete="given-name"
         />
         <Input
           id="lname"
           label="Last name"
           placeholder="Enter Last name"
           value={lname}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+          onChange={(e) => {
             setLname(e.target.value);
             if (touched.lname) {
               setFieldErrors((prev) => ({
@@ -159,7 +158,7 @@ export default function UserDetailsPage() {
               }));
             }
           }}
-          onBlur={(e: ChangeEvent<HTMLInputElement>) => {
+          onBlur={(e) => {
             setTouched((t) => ({ ...t, lname: true }));
             setFieldErrors((prev) => ({
               ...prev,
@@ -167,6 +166,7 @@ export default function UserDetailsPage() {
             }));
           }}
           error={fieldErrors.lname}
+          autoComplete="family-name"
         />
         <Input
           id="companyDisplay"
@@ -180,7 +180,7 @@ export default function UserDetailsPage() {
           className="btn--block btn--verify"
           onClick={handleVerifyEmail}
           loading={loading}
-          disabled={!isFormComplete}
+          disabled={!isFormComplete || !company?.id}
         >
           Verify email
         </Button>

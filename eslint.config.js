@@ -1,10 +1,8 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import { defineConfig, globalIgnores } from 'eslint/config'
-import tseslint from '@typescript-eslint/eslint-plugin'
-import tsParser from '@typescript-eslint/parser'
+import js from '@eslint/js';
+import globals from 'globals';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
+import { defineConfig, globalIgnores } from 'eslint/config';
 
 export default defineConfig([
   globalIgnores(['dist']),
@@ -17,17 +15,9 @@ export default defineConfig([
     ],
     languageOptions: {
       globals: globals.browser,
-      parser: tsParser,
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
-    plugins: {
-      '@typescript-eslint': tseslint,
-    },
     rules: {
-      ...tseslint.configs.recommended.rules,
-      // This codebase uses pragmatic boundary types in a few places (API responses, redux state hydration).
-      '@typescript-eslint/no-explicit-any': 'off',
-
       // This repo intentionally triggers an OTP auto-resend inside an effect.
       'react-hooks/set-state-in-effect': 'off',
     },
@@ -38,4 +28,4 @@ export default defineConfig([
       globals: globals.node,
     },
   },
-])
+]);

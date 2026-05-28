@@ -1,19 +1,6 @@
-import type { ButtonHTMLAttributes } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from './Button';
 import arrowLeft from '../assets/icons/arrow-left-bold.svg';
-
-type StepActionsProps = {
-  backTo?: string;
-  onBack?: () => void;
-  onPrimary?: () => void;
-  primaryLabel?: string;
-  primaryType?: ButtonHTMLAttributes<HTMLButtonElement>['type'];
-  loading?: boolean;
-  primaryDisabled?: boolean;
-  showBack?: boolean;
-  showBackIcon?: boolean;
-};
 
 export default function StepActions({
   backTo,
@@ -25,7 +12,7 @@ export default function StepActions({
   primaryDisabled = false,
   showBack = true,
   showBackIcon = true,
-}: StepActionsProps) {
+}) {
   const navigate = useNavigate();
 
   const handleBack = () => {

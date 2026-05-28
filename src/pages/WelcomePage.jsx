@@ -16,12 +16,9 @@ export default function WelcomePage() {
     (typeof registeredUser?.user === 'string' ? registeredUser.user : '');
 
   const normalizedUserName =
-    typeof userNameFromApi === 'string'
-      ? userNameFromApi.split(/[\s._-]+/)[0]
-      : '';
+    typeof userNameFromApi === 'string' ? userNameFromApi.split(/[\s._-]+/)[0] : '';
 
-  const displayName =
-    registeredUser?.fname || normalizedUserName || userDetails.fname || '';
+  const displayName = registeredUser?.fname || normalizedUserName || userDetails.fname || '';
 
   const handleStart = () => {
     dispatch(resetRegistration());
@@ -31,21 +28,16 @@ export default function WelcomePage() {
   return (
     <div className="welcome-page">
       <div className="welcome-page__content">
-        <img
-          src={welcomeIcon}
-          alt=""
-          className="welcome-page__icon"
-          aria-hidden="true"
-        />
+        <img src={welcomeIcon} alt="" className="welcome-page__icon" aria-hidden="true" />
 
         <h1 className="welcome-page__title">
           Welcome{displayName ? ` ${displayName}` : ''}!
         </h1>
 
         <p className="welcome-page__text">
-          Welcome to Woliba! You&apos;ll find wellness challenges, fitness and recipe
-          videos, and daily tips to support your health goals. Download our iOS or
-          Android app and start your wellbeing journey today.
+          Welcome to Woliba! You&apos;ll find wellness challenges, fitness and recipe videos,
+          and daily tips to support your health goals. Download our iOS or Android app and
+          start your wellbeing journey today.
         </p>
 
         <Button onClick={handleStart} className="welcome-page__cta">

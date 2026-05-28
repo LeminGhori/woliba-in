@@ -1,0 +1,22 @@
+:root {
+  --color-primary: #da6c74;
+  --color-primary-dark: #c25860;
+  --color-primary-light: #fdf0f1;
+  --color-text: #1c1c1e;
+  --color-text-muted: #68686b;
+  --color-border: #d9d9de;
+  --color-error: #e53935;
+  --color-success: #da6c74;
+  --color-white: #ffffff;
+  --color-page-bg: #f5f7fa;
+  --color-card-bg: #ffffff;
+  --shadow-card: 0 4px 24px rgba(28, 28, 30, 0.08);
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --footer-height: 48px;
+  --content-max: 440px;
+  --content-wide: 1040px;
+  --focus-ring: rgba(218, 108, 116, 0.2);
+}
